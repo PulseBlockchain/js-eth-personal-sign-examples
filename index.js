@@ -16,6 +16,41 @@ ethSignButton.addEventListener('click', function(event) {
   })
 })
 
+mmPersonalSignButton.addEventListener('click', function(event) {
+  event.preventDefault()
+  var text = 'Hi Alice'
+  var msg = ethUtil.bufferToHex(new Buffer(text, 'utf8'))
+  console.log(msg)
+  var from = web3.eth.accounts[0]
+  console.log(`msg=${msg} from=${from}`)
+
+  /*  web3.personal.sign not yet implemented!!!
+   *  We're going to have to assemble the tx manually!
+   *  This is what it would probably look like, though:
+   */
+    web3.personal.sign(msg, from,function (err, result) {
+      if (err) return console.error(err)
+      console.log('PERSONAL SIGNED:' + result)
+
+      var params = [msg, from]
+      console.log('recovering...')
+      const msgParams = { data: msg }
+      msgParams.sig = result.result
+      console.dir({ msgParams })
+      const recovered = sigUtil.recoverPersonalSignature(msgParams)
+      console.dir({ recovered })
+
+      if (recovered === from ) {
+        console.log('SigUtil Successfully verified signer as ' + from)
+      } else {
+        console.dir(recovered)
+        console.log('SigUtil Failed to verify signer when comparing ' + recovered.result + ' to ' + from)
+        console.log('Failed, comparing %s to %s', recovered, from)
+      }
+    })
+})
+
+
 personalSignButton.addEventListener('click', function(event) {
   event.preventDefault()
   var text = terms
